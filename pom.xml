@@ -19,6 +19,7 @@
     <modules>
         <module>desafio-core</module>
         <module>desafio-api</module>
+        <module>desafio-worker</module>
     </modules>
 
     <build>

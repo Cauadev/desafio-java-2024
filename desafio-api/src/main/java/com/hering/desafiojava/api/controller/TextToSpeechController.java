@@ -1,8 +1,13 @@
 package com.hering.desafiojava.api.controller;
 
+import com.hering.desafiojava.api.services.TextToSpeechProducerService;
+import com.hering.desafiojava.core.entities.TextToSpeechStatus;
 import com.hering.desafiojava.core.services.model.TextToSpeechModel;
 import com.hering.desafiojava.core.services.TextToSpeechService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,9 +21,11 @@ import java.util.List;
 public class TextToSpeechController {
 
     private TextToSpeechService service;
+    private TextToSpeechProducerService kafkaService;
 
-    public TextToSpeechController(TextToSpeechService service) {
+    public TextToSpeechController(TextToSpeechService service, TextToSpeechProducerService kafkaService) {
         this.service = service;
+        this.kafkaService = kafkaService;
     }
 
     @GetMapping("{id}")
@@ -43,4 +50,17 @@ public class TextToSpeechController {
         return model;
     }
 
+    @GetMapping()
+    public ResponseEntity<Page<TextToSpeechModel>> list(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
+                                                        @RequestParam(name = "status", required = false) List<TextToSpeechStatus> statusList){
+        return ResponseEntity.ok().body(service.list(pageable, statusList));
+    }
+
+
+    @GetMapping("async")
+    public TextToSpeechModel createAsync(@RequestParam("text") String text, @RequestParam("language") String language, @RequestParam("voice") String voice){
+        TextToSpeechModel model = service.createSpeechAsync(language,voice,text);
+        kafkaService.sendIdToQueue(model.getId());
+        return model;
+    }
 }
