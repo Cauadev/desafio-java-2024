@@ -1,4 +1,4 @@
-const BASE_URL_API = "https://desafio-java-hering.onrender.com/api/v1/text-to-speech"
+const BASE_URL_API = "http://localhost:8080/api/v1/text-to-speech"
 
 document.getElementById("tts-form").addEventListener('submit', async (e) => {
     e.preventDefault();

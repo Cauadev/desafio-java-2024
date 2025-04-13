@@ -20,12 +20,6 @@ public class KafkaProducerConfig {
     @Value(value = "${KAFKA_BOOTSTRAP_SERVERS}")
     private String bootstrapAddress;
 
-    @Value(value = "${KAFKA_USERNAME}")
-    private String KAFKA_USERNAME;
-
-    @Value(value = "${KAFKA_PASSWORD}")
-    private String KAFKA_PASSWORD;
-
 
     @Bean
     public ProducerFactory<String, Long> kafkaProducerFactory() {
@@ -35,9 +29,6 @@ public class KafkaProducerConfig {
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, LongSerializer.class);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "45000");
-        props.put("sasl.mechanism", "PLAIN");
-        props.put("sasl.jaas.config", "org.apache.kafka.common.security.plain.PlainLoginModule required username='"+KAFKA_USERNAME+"' password='"+KAFKA_PASSWORD+"';");
-        props.put("security.protocol", "SASL_SSL");
         return new DefaultKafkaProducerFactory<>(props);
     }
 
