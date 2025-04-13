@@ -2,13 +2,17 @@ package com.hering.desafiojava.core.services.model;
 
 import com.hering.desafiojava.core.entities.TextToSpeech;
 import com.hering.desafiojava.core.entities.TextToSpeechStatus;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class TextToSpeechModel {
     private Long id;
     private Instant momment;

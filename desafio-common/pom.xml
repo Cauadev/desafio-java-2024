@@ -11,7 +11,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>desafio-core</artifactId>
+    <artifactId>desafio-common</artifactId>
     <packaging>jar</packaging>
 
     <dependencyManagement>
@@ -28,23 +28,16 @@
     </dependencyManagement>
 
     <dependencies>
-
-        <dependency>
-            <groupId>com.hering.desafiojava</groupId>
-            <artifactId>desafio-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
     </dependencies>
     <build>
         <plugins>

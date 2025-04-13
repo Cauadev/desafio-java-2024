@@ -1,13 +1,21 @@
 package com.hering.desafiojava.core.services;
 
+import com.hering.desafiojava.common.exceptions.BusinessException;
 import com.hering.desafiojava.core.entities.TextToSpeech;
 import com.hering.desafiojava.core.entities.TextToSpeechStatus;
 import com.hering.desafiojava.core.repositories.TextToSpeechRepository;
 import com.hering.desafiojava.core.services.model.TextToSpeechModel;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,10 +29,11 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class TextToSpeechService {
+
+    private static final Logger log = LoggerFactory.getLogger(TextToSpeechService.class);
 
     private final TextToSpeechRepository repository;
 
@@ -97,9 +106,12 @@ public class TextToSpeechService {
 
 
     @Transactional
-    public void requestVoiceRSSAndUpdate(Long textToSpeechId){
-
-        var entity = repository.findById(textToSpeechId).orElseThrow(() -> new RuntimeException("Consulta não encontrada"));
+    public void requestVoiceRSSAndUpdate(Long textToSpeechId) {
+        var entity = repository.findById(textToSpeechId)
+                .orElseThrow(() -> {
+                   log.error("Erro ao processar text-to-speech (ID: {}): Consulta não encontrada no banco", textToSpeechId);
+                   throw new BusinessException("Consulta não encontrada", HttpStatus.NOT_FOUND);
+                });
 
         final HttpClient httpClient = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
@@ -115,26 +127,29 @@ public class TextToSpeechService {
 
             var httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
-            if(httpResponse.statusCode() != 200){
+            if (httpResponse.statusCode() != 200) {
                 entity.setStatus(TextToSpeechStatus.ERROR);
-                entity.setErrorText(httpResponse.body().toString());
-                return;
+                entity.setErrorText("Erro HTTP: " + httpResponse.statusCode());
+            } else {
+                InputStream is = httpResponse.body();
+                byte[] bytes = is.readAllBytes();
+                String encoded = Base64.getEncoder().encodeToString(bytes);
+                entity.setAudioWavBase64(encoded);
+                entity.setStatus(TextToSpeechStatus.COMPLETED);
             }
 
-            InputStream is = httpResponse.body();
-            byte[] bytes = is.readAllBytes();
-            String encoded = Base64.getEncoder().encodeToString(bytes);
-            entity.setAudioWavBase64(encoded);
-            entity.setStatus(TextToSpeechStatus.COMPLETED);
+        } catch (IOException | URISyntaxException | InterruptedException | ResourceAccessException e) {
+            entity.setStatus(TextToSpeechStatus.ERROR);
+            entity.setErrorText("Falha ao conectar com a API: " + (e.getMessage() != null ? e.getMessage() : "Sem conexão com a internet"));
 
-            repository.save(entity);
-        } catch (URISyntaxException | IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+            log.error("Erro ao processar text-to-speech (ID: {}): {}", textToSpeechId, e.getMessage(), e);
         }
+
+        repository.save(entity);
     }
 
     public TextToSpeechModel search(Long id) {
-        var entity = repository.findById(id).orElseThrow(() -> new RuntimeException("Consulta não encontrada"));
+        var entity = repository.findById(id).orElseThrow(() -> new BusinessException("Consulta não encontrada", HttpStatus.NOT_FOUND));
         return TextToSpeechModel.fromEntity(entity);
     }
 
@@ -146,9 +161,21 @@ public class TextToSpeechService {
         }
     }
 
-    public byte[] searchAudio(Long id) {
-        var entity = repository.findById(id).orElseThrow(() -> new RuntimeException("Consulta não encontrada"));
-        return Base64.getDecoder().decode(entity.getAudioWavBase64());
+    public ResponseEntity<?> searchAudio(Long id) {
+        var entity = repository.findById(id).orElseThrow(() -> new BusinessException("Consulta não encontrada", HttpStatus.NOT_FOUND));
+        switch (entity.getStatus()){
+            case ERROR:
+                throw new BusinessException("Falha no processamento do áudio");
+            case PROCESSING:
+                return ResponseEntity
+                        .status(HttpStatus.ACCEPTED)
+                        .body("Audio ainda em processamento");
+        }
+
+        byte[] audioBytes = Base64.getDecoder().decode(entity.getAudioWavBase64());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("audio/wav"));
+        return new ResponseEntity<>(audioBytes, headers, HttpStatus.OK);
     }
 
     public Page<TextToSpeechModel> list(Pageable pageable, List<TextToSpeechStatus> statusList) {

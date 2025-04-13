@@ -20,6 +20,7 @@
         <module>desafio-core</module>
         <module>desafio-api</module>
         <module>desafio-worker</module>
+        <module>desafio-common</module>
     </modules>
 
     <build>

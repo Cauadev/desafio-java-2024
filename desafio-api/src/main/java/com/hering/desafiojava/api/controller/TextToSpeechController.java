@@ -34,12 +34,8 @@ public class TextToSpeechController {
     }
 
     @GetMapping("{id}/audio")
-    public ResponseEntity<byte[]> byAudioId(@PathVariable("id") Long id){
-        byte[] bytes = service.searchAudio(id);
-
-        var headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("audio/wav"));
-        return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+    public ResponseEntity<?> byAudioId(@PathVariable("id") Long id) {
+        return service.searchAudio(id);
     }
 
     @GetMapping("sync")
