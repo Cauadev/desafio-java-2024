@@ -2,9 +2,299 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Teste TTS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste TTS - Desafio Hering Java 2024</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            max-width: 800px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .form-section, .status-section, .list-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+        }
+        button {
+            background-color: #107dea;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #status-message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .processing { background-color: #fff3cd; color: #856404; }
+
+        #form-status{
+            padding: 12px;
+        }
+
+        .audio-section {
+            display: flex;
+            justify-content: center;
+            padding: 12px;
+        }
+    </style>
 </head>
 <body>
-<h1>Text-to-Speech - Teste Rápido</h1>
+<h1>Text-to-Speech</h1>
+
+
+<div class="form-section">
+    <h2>Converter Texto em Audio</h2>
+    <form id="tts-form">
+        <label for="text">Texto:</label>
+        <textarea rows="3" maxlength="100" id="text" name="text" required placeholder="Digite o texto para converter (Máximo 100 caracteres)"></textarea>
+
+        <label for="voice">Voz:</label>
+        <select id="voice" name="voice">
+            <option value="">------- Select language and voice -------</option>
+            <optgroup label="Arabic (Egypt)" class="legacy">
+                <option value="ar-eg:Oda">Oda (Female)</option>
+            </optgroup>
+            <optgroup label="Arabic (Saudi Arabia)" class="legacy">
+                <option value="ar-sa:Salim">Salim (Male)</option>
+            </optgroup>
+            <optgroup label="Bulgarian">
+                <option value="bg-bg:Dimo">Dimo (Male)</option>
+            </optgroup>
+            <optgroup label="Catalan">
+                <option value="ca-es:Rut">Rut (Female)</option>
+            </optgroup>
+            <optgroup label="Chinese (China)">
+                <option value="zh-cn:Luli">Luli (Female)</option>
+                <option value="zh-cn:Shu">Shu (Female)</option>
+                <option value="zh-cn:Chow">Chow (Female)</option>
+                <option value="zh-cn:Wang">Wang (Male)</option>
+            </optgroup>
+            <optgroup label="Chinese (Hong Kong)">
+                <option value="zh-hk:Jia">Jia (Female)</option>
+                <option value="zh-hk:Xia">Xia (Female)</option>
+                <option value="zh-hk:Chen">Chen (Male)</option>
+            </optgroup>
+            <optgroup label="Chinese (Taiwan)">
+                <option value="zh-tw:Akemi">Akemi (Female)</option>
+                <option value="zh-tw:Lin">Lin (Female)</option>
+                <option value="zh-tw:Lee">Lee (Male)</option>
+            </optgroup>
+            <optgroup label="Croatian">
+                <option value="hr-hr:Nikola">Nikola (Male)</option>
+            </optgroup>
+            <optgroup label="Czech">
+                <option value="cs-cz:Josef">Josef (Male)</option>
+            </optgroup>
+            <optgroup label="Danish">
+                <option value="da-dk:Freja">Freja (Female)</option>
+            </optgroup>
+            <optgroup label="Dutch (Belgium)">
+                <option value="nl-be:Daan">Daan (Male)</option>
+            </optgroup>
+            <optgroup label="Dutch (Netherlands)">
+                <option value="nl-nl:Lotte">Lotte (Female)</option>
+                <option value="nl-nl:Bram">Bram (Male)</option>
+            </optgroup>
+            <optgroup label="English (Australia)">
+                <option value="en-au:Zoe">Zoe (Female)</option>
+                <option value="en-au:Isla">Isla (Female)</option>
+                <option value="en-au:Evie">Evie (Female)</option>
+                <option value="en-au:Jack">Jack (Male)</option>
+            </optgroup>
+            <optgroup label="English (Canada)">
+                <option value="en-ca:Rose">Rose (Female)</option>
+                <option value="en-ca:Clara">Clara (Female)</option>
+                <option value="en-ca:Emma">Emma (Female)</option>
+                <option value="en-ca:Mason">Mason (Male)</option>
+            </optgroup>
+            <optgroup label="English (Great Britain)">
+                <option value="en-gb:Alice">Alice (Female)</option>
+                <option value="en-gb:Nancy">Nancy (Female)</option>
+                <option value="en-gb:Lily">Lily (Female)</option>
+                <option value="en-gb:Harry">Harry (Male)</option>
+            </optgroup>
+            <optgroup label="English (India)">
+                <option value="en-in:Eka">Eka (Female)</option>
+                <option value="en-in:Jai">Jai (Female)</option>
+                <option value="en-in:Ajit">Ajit (Male)</option>
+            </optgroup>
+            <optgroup label="English (Ireland)">
+                <option value="en-ie:Oran">Oran (Male)</option>
+            </optgroup>
+            <optgroup label="English (United States)">
+                <option value="en-us:Linda">Linda (Female)</option>
+                <option value="en-us:Amy">Amy (Female)</option>
+                <option value="en-us:Mary">Mary (Female)</option>
+                <option value="en-us:John">John (Male)</option>
+                <option value="en-us:Mike">Mike (Male)</option>
+            </optgroup>
+            <optgroup label="Finnish">
+                <option value="fi-fi:Aada">Aada (Female)</option>
+            </optgroup>
+            <optgroup label="French (Canada)">
+                <option value="fr-ca:Emile">Emile (Female)</option>
+                <option value="fr-ca:Olivia">Olivia (Female)</option>
+                <option value="fr-ca:Logan">Logan (Female)</option>
+                <option value="fr-ca:Felix">Felix (Male)</option>
+            </optgroup>
+            <optgroup label="French (France)">
+                <option value="fr-fr:Bette">Bette (Female)</option>
+                <option value="fr-fr:Iva">Iva (Female)</option>
+                <option value="fr-fr:Zola">Zola (Female)</option>
+                <option value="fr-fr:Axel">Axel (Male)</option>
+            </optgroup>
+            <optgroup label="French (Switzerland)">
+                <option value="fr-ch:Theo">Theo (Male)</option>
+            </optgroup>
+            <optgroup label="German (Austria)">
+                <option value="de-at:Lukas">Lukas (Male)</option>
+            </optgroup>
+            <optgroup label="German (Germany)">
+                <option value="de-de:Hanna">Hanna (Female)</option>
+                <option value="de-de:Lina">Lina (Female)</option>
+                <option value="de-de:Jonas">Jonas (Male)</option>
+            </optgroup>
+            <optgroup label="German (Switzerland)">
+                <option value="de-ch:Tim">Tim (Male)</option>
+            </optgroup>
+            <optgroup label="Greek">
+                <option value="el-gr:Neo">Neo (Male)</option>
+            </optgroup>
+            <optgroup label="Hebrew">
+                <option value="he-il:Rami">Rami (Male)</option>
+            </optgroup>
+            <optgroup label="Hindi">
+                <option value="hi-in:Puja">Puja (Female)</option>
+                <option value="hi-in:Kabir">Kabir (Male)</option>
+            </optgroup>
+            <optgroup label="Hungarian">
+                <option value="hu-hu:Mate">Mate (Male)</option>
+            </optgroup>
+            <optgroup label="Indonesian">
+                <option value="id-id:Intan">Intan (Male)</option>
+            </optgroup>
+            <optgroup label="Italian">
+                <option value="it-it:Bria">Bria (Female)</option>
+                <option value="it-it:Mia">Mia (Female)</option>
+                <option value="it-it:Pietro">Pietro (Male)</option>
+            </optgroup>
+            <optgroup label="Japanese">
+                <option value="ja-jp:Hina">Hina (Female)</option>
+                <option value="ja-jp:Airi">Airi (Female)</option>
+                <option value="ja-jp:Fumi">Fumi (Female)</option>
+                <option value="ja-jp:Akira">Akira (Male)</option>
+            </optgroup>
+            <optgroup label="Korean">
+                <option value="ko-kr:Nari">Nari (Female)</option>
+            </optgroup>
+            <optgroup label="Malay">
+                <option value="ms-my:Aqil">Aqil (Male)</option>
+            </optgroup>
+            <optgroup label="Norwegian">
+                <option value="nb-no:Marte">Marte (Female)</option>
+                <option value="nb-no:Erik">Erik (Male)</option>
+            </optgroup>
+            <optgroup label="Polish">
+                <option value="pl-pl:Julia">Julia (Female)</option>
+                <option value="pl-pl:Jan">Jan (Male)</option>
+            </optgroup>
+            <optgroup label="Portuguese (Brazil)">
+                <option value="pt-br:Marcia">Marcia (Female)</option>
+                <option value="pt-br:Ligia">Ligia (Female)</option>
+                <option value="pt-br:Yara">Yara (Female)</option>
+                <option value="pt-br:Dinis">Dinis (Male)</option>
+            </optgroup>
+            <optgroup label="Portuguese (Portugal)">
+                <option value="pt-pt:Leonor">Leonor (Female)</option>
+            </optgroup>
+            <optgroup label="Romanian">
+                <option value="ro-ro:Doru">Doru (Male)</option>
+            </optgroup>
+            <optgroup label="Russian">
+                <option value="ru-ru:Olga">Olga (Female)</option>
+                <option value="ru-ru:Marina">Marina (Female)</option>
+                <option value="ru-ru:Peter">Peter (Male)</option>
+            </optgroup>
+            <optgroup label="Slovak">
+                <option value="sk-sk:Beda">Beda (Male)</option>
+            </optgroup>
+            <optgroup label="Slovenian">
+                <option value="sl-si:Vid">Vid (Male)</option>
+            </optgroup>
+            <optgroup label="Spanish (Mexico)">
+                <option value="es-mx:Juana">Juana (Female)</option>
+                <option value="es-mx:Silvia">Silvia (Female)</option>
+                <option value="es-mx:Teresa">Teresa (Female)</option>
+                <option value="es-mx:Jose">Jose (Male)</option>
+            </optgroup>
+            <optgroup label="Spanish (Spain)">
+                <option value="es-es:Camila">Camila (Female)</option>
+                <option value="es-es:Sofia">Sofia (Female)</option>
+                <option value="es-es:Luna">Luna (Female)</option>
+                <option value="es-es:Diego">Diego (Male)</option>
+            </optgroup>
+            <optgroup label="Swedish">
+                <option value="sv-se:Molly">Molly (Female)</option>
+                <option value="sv-se:Hugo">Hugo (Male)</option>
+            </optgroup>
+            <optgroup label="Tamil">
+                <option value="ta-in:Sai">Sai (Male)</option>
+            </optgroup>
+            <optgroup label="Thai">
+                <option value="th-th:Ukrit">Ukrit (Male)</option>
+            </optgroup>
+            <optgroup label="Turkish">
+                <option value="tr-tr:Omer">Omer (Male)</option>
+            </optgroup>
+            <optgroup label="Vietnamese">
+                <option value="vi-vn:Chi">Chi (Male)</option>
+            </optgroup>
+        </select>
+
+        <button type="submit">Converter</button>
+    </form>
+    <div id="form-status"></div>
+</div>
+
+<div class="status-section">
+    <h2>Consultar Audio</h2>
+    <label for="request-id">ID da Requisição:</label>
+    <input type="number" id="request-id" placeholder="Digite o ID da requisição" required>
+    <button onclick="getAudioById()">Verificar Status</button>
+    <div id="status-message"></div>
+    <div class="audio-section">
+        <audio id="audio-player" controls style="display: none;"></audio>
+    </div>
+</div>
+
+<script src="js/index.js"></script>
 </body>
 </html>
