@@ -18,7 +18,15 @@ As principais dependências:
 Módulos da solução (padrão monorepo):
 * desafio-core: módulo central para reutilização de regras
 * desafio-api: api para text-to-speech
-* desafio-worker: processa de forma assíncrona text-to-speech. (não está implementado ainda, faz parte da avaliação)
+* desafio-worker: processa de forma assíncrona text-to-speech.
+
+## Questões Descritivas
+
+* Acredito que a performance do banco está muito relacionada a alguns pontos, como: um mapeamento correto das entidades, uso de índices, e a limitação de grandes consultas, que pode ser feita, por exemplo, através de paginação.
+
+
+* Adicionar camada de autenticação, por limites nas consultas (usando o rate limit por exemplo), ter atenção no que a api expõe nos retornos das rotas. E acredito que os ataques mais comuns sejam Brute Force, SQL Injection e CSRF
+
 
 ## Compilação e fechamento de pacote
 
@@ -31,6 +39,12 @@ Considerando que todos o pré-requisitos para o build (declarados acima) foram i
 ```
 
 ## Documentação da API Rest
+
+**Caso queira acessar o frontend da aplicação acesse:**
+```http://localhost:8080/api```
+
+#
+
 
 
 #### Listar consultas
